@@ -14,6 +14,10 @@ services:
       - api-bin:/src/OktaCapstone.Api/bin
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Default: "Server=mssql,1433;Database=AppDb;User ID=sa;Password=Your_password123;TrustServerCertificate=True;"
+    depends_on:
+      mssql:
+        condition: service_healthy
     # Optional: ensure web can reach api via http://api:8080
     networks: [devnet]
 
@@ -35,6 +39,23 @@ services:
     depends_on: [api]
     networks: [devnet]
 
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    user: "0:0"                 # avoids permission issues on Linux/macOS
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Your_password123"   # change in real use
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    healthcheck:
+      test: ['CMD-SHELL', '/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "$${SA_PASSWORD}" -Q "SELECT 1" -b -o /dev/null || exit 1']
+      interval: 10s
+      timeout: 3s
+      retries: 20
+
 volumes:
   api-nuget: {}
   api-obj: {}
@@ -42,6 +63,7 @@ volumes:
   blazor-nuget: {}
   blazor-obj: {}
   blazor-bin: {}
+  mssql-data: {}
 
 networks:
   devnet: {}
