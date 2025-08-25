@@ -1,0 +1,47 @@
+services:
+  api:
+    build:
+      context: .
+      target: api-dev
+    ports:
+      - "5075:8080"
+    volumes:
+      # Mount the whole repo so watch sees changes
+      - ./:/src:cached
+      # Persist NuGet + obj/bin caches for faster rebuilds
+      - api-nuget:/root/.nuget/packages
+      - api-obj:/src/OktaCapstone.Api/obj
+      - api-bin:/src/OktaCapstone.Api/bin
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    # Optional: ensure web can reach api via http://api:8080
+    networks: [devnet]
+
+  blazor:
+    build:
+      context: .
+      target: blazor-dev
+    ports:
+      - "8000:8080"
+    volumes:
+      - ./:/src:cached
+      - blazor-nuget:/root/.nuget/packages
+      - blazor-obj:/src/OktaCapstone.Blazor/obj
+      - blazor-bin:/src/OktaCapstone.Blazor/bin
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      # e.g. your app settings can point here:
+      # API_BASE_URL: "http://api:8080"
+    depends_on: [api]
+    networks: [devnet]
+
+volumes:
+  api-nuget: {}
+  api-obj: {}
+  api-bin: {}
+  blazor-nuget: {}
+  blazor-obj: {}
+  blazor-bin: {}
+
+networks:
+  devnet: {}

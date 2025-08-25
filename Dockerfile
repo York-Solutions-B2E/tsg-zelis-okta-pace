@@ -39,3 +39,28 @@ COPY --from=publish /out/blazor ./
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "OktaCapstone.Blazor.dll"]
+
+
+# Dev base (SDK)
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION} AS devbase
+WORKDIR /src
+ENV ASPNETCORE_ENVIRONMENT=Development
+# Needed for mounted volumes on Docker Desktop/WSL/macOS
+ENV DOTNET_USE_POLLING_FILE_WATCHER=1
+# Improves watch reliability in containers
+ENV DOTNET_WATCH_RESTART_ON_RUDE_EDIT=1
+
+# Dev target: API
+FROM devbase AS api-dev
+COPY . .
+WORKDIR ./OktaCapstone.Api
+EXPOSE 8080
+# dotnet-watch will rebuild/restart or hot-reload as you edit
+CMD ["dotnet", "watch", "run", "--no-launch-profile", "--urls", "http://0.0.0.0:8080"]
+
+# Dev target: Blazor Server
+FROM devbase AS blazor-dev
+COPY . .
+WORKDIR ./OktaCapstone.Blazor
+EXPOSE 8080
+CMD ["dotnet", "watch", "run", "--no-launch-profile", "--urls", "http://0.0.0.0:8080"]
