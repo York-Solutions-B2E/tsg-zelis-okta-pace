@@ -12,7 +12,7 @@ using OktaCapstone.Api.Data;
 namespace OktaCapstone.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250825182932_InitialCreate")]
+    [Migration("20250825212333_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -170,13 +170,13 @@ namespace OktaCapstone.Api.Migrations
                     b.HasOne("OktaCapstone.Api.Models.User", "Author")
                         .WithMany()
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("OktaCapstone.Api.Models.User", "Target")
                         .WithMany()
                         .HasForeignKey("TargetId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Author");

@@ -14,7 +14,7 @@ services:
       - api-bin:/src/OktaCapstone.Api/bin
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__Default: "Server=mssql,1433;Database=AppDb;User ID=sa;Password=Your_password123;TrustServerCertificate=True;"
+      ConnectionStrings__Default: "Server=mssql,1433;Database=AppDb;User ID=sa;Password=Your_password123;Encrypt=True;TrustServerCertificate=True;"
     depends_on:
       mssql:
         condition: service_healthy
@@ -55,6 +55,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 20
+    networks: [devnet]
 
 volumes:
   api-nuget: {}

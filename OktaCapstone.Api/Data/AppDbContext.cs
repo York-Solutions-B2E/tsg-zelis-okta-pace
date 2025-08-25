@@ -10,7 +10,20 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
   public DbSet<SecurityEvent> SecurityEvents => Set<SecurityEvent>();
   public DbSet<User> Users => Set<User>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    modelBuilder.Entity<SecurityEvent>(b =>
     {
-    }
+      b.HasOne(e => e.Author)
+        .WithMany()
+        .HasForeignKey(e => e.AuthorId)
+        .OnDelete(DeleteBehavior.NoAction);
+
+      b.HasOne(e => e.Target)
+        .WithMany()
+        .HasForeignKey(e => e.TargetId)
+        .OnDelete(DeleteBehavior.NoAction);
+    });
+    base.OnModelCreating(modelBuilder);
+  }
 }
