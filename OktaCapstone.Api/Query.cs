@@ -14,10 +14,10 @@ public class Query
     db.SecurityEvents;
 
   public IQueryable<Role> Roles([Service] AppDbContext db) =>
-    db.Roles;
+    db.Roles.Include(r => r.Claims);
 
   public IQueryable<Claim> Claims([Service] AppDbContext db) =>
-    db.Claims;
+    db.Claims.Include(c => c.Roles);
 
   public IQueryable<User> Users([Service] AppDbContext db) =>
     db.Users;

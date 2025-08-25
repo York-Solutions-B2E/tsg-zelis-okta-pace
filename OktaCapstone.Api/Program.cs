@@ -8,7 +8,6 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Default")
     ?? throw new InvalidOperationException("Missing ConnectionStrings:Default");
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(connectionString));
-// builder.Services.AddHostedService<StartupMigrator>(); // Runs migrations in dev only.
 
 builder.Services
     .AddGraphQLServer()
@@ -31,8 +30,8 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
-    int count = await db.Users.CountAsync();
-    Console.WriteLine($"GOT {count} USERS");
+    int count = await db.Users.CountAsync(); // operation to force ef to migrate right now.
+    await DbHelpers.AddDefaultRolesAndClaims(db);
 }
 
 // GraphQL Endpoints & UI
